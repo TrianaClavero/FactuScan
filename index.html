@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactuScan - Lector de Facturas Inteligente</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <main class="container">
+        <header>
+            <h1>FactuScan</h1>
+            <p>Subí tus facturas para procesar los datos y organizar tus cuentas</p>
+        </header>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            
+            <div class="upload-area" id="dropZone">
+                <input type="file" id="invoiceFile" name="file" class="file-input-hidden" accept=".pdf,image/*" required>
+                <label for="invoiceFile" class="upload-label">
+                    <strong>Seleccioná una factura o arrastrala acá</strong>
+                    <span>Formatos admitidos: PDF, PNG, JPG</span>
+                </label>
+            </div>
+
+            <div class="status-container" id="statusContainer" aria-live="polite">
+                <span class="status-text" id="statusText">Esperando documento...</span>
+            </div>
+
+            <a href="#" id="downloadBtn" class="btn-download" role="button" aria-disabled="true">
+                Descargar Excel Actualizado
+            </a>
+
+        </form>
+    </main>
+
+    <script>
+        // Aca agregariamos más adelante la lógica de JavaScript (fetch hacia el Webhook de n8n)
+        // para capturar el archivo, cambiar los estados de carga y activar el botón de descarga.
+    </script>
+</body>
+</html>
