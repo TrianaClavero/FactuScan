@@ -36,8 +36,98 @@
     </main>
 
     <script>
-        // Aca agregariamos más adelante la lógica de JavaScript (fetch hacia el Webhook de n8n)
-        // para capturar el archivo, cambiar los estados de carga y activar el botón de descarga.
+
+        const url = 'http://localhost:5678/webhook-test/subir-factura';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('invoiceFile');
+        const statusText = document.getElementById('statusText');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function setProcessingState() {
+            statusText.textContent = 'Procesando documento... por favor espere.';
+            downloadBtn.classList.remove('active');
+            downloadBtn.removeAttribute('href');
+            downloadBtn.setAttribute('aria-disabled', 'true');
+        }
+
+        function setErrorState() {
+            statusText.textContent = 'Error al procesar el documento. Por favor, intentá nuevamente.';
+            downloadBtn.classList.remove('active');
+            downloadBtn.removeAttribute('href');
+            downloadBtn.setAttribute('aria-disabled', 'true');
+        }
+
+        async function uploadInvoice(file) {
+            setProcessingState();
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // VERIFICACIÓN: Si n8n no responde con éxito, arroja error
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+
+                const blob = await response.blob();
+
+                // Generamos una URL temporal en memoria que apunta al archivo CSV recibido
+                const csvUrl = window.URL.createObjectURL(blob);
+
+                statusText.textContent = '¡Procesado con éxito!';
+                
+                // Asignamos la URL en memoria al botón
+                downloadBtn.setAttribute('href', csvUrl);
+                
+                // Forzamos el nombre del archivo al momento de la descarga
+                downloadBtn.setAttribute('download', 'reporte_facturas.csv');
+                
+                downloadBtn.classList.add('active');
+                downloadBtn.setAttribute('aria-disabled', 'false');
+
+            } catch (error) {
+                console.error('Error:', error);
+                setErrorState();
+            }
+        }
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (event) => {
+            event.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                uploadInvoice(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            if (event.target.files.length > 0) {
+                uploadInvoice(event.target.files[0]);
+            }
+        });
+
+
+    
     </script>
 </body>
 </html>
